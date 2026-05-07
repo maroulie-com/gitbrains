@@ -1,0 +1,44 @@
+{
+  "name": "intelligit",
+  "displayName": "IntelliGit",
+  "description": "Git helpers: rollback, diff, blame annotations, and commit viewer",
+  "version": "0.0.2",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "publisher": "maroulie-com",
+  "license": "MIT",
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "gitHelpers.rollback",          "title": "Git: Rollback to Origin HEAD" },
+      { "command": "gitHelpers.localRollback",     "title": "Git: Rollback to Local HEAD" },
+      { "command": "gitHelpers.showDiff",          "title": "Git: Show Staged Diff" },
+      { "command": "gitHelpers.compareWithBranch", "title": "Git: Compare with Branch" },
+      { "command": "gitHelpers.toggleAnnotate",    "title": "Git: Toggle Blame Annotations" }
+    ],
+    "menus": {
+      "explorer/context": [
+        { "command": "gitHelpers.rollback",          "when": "gitHelpers.hasOriginHead", "group": "gitHelpers@1" },
+        { "command": "gitHelpers.localRollback",     "group": "gitHelpers@2" },
+        { "command": "gitHelpers.showDiff",          "group": "gitHelpers@3" },
+        { "command": "gitHelpers.compareWithBranch", "group": "gitHelpers@4" },
+        { "command": "gitHelpers.toggleAnnotate",    "group": "gitHelpers@5" }
+      ],
+      "editor/context": [
+        { "command": "gitHelpers.rollback",          "when": "gitHelpers.hasOriginHead", "group": "gitHelpers@1" },
+        { "command": "gitHelpers.localRollback",     "group": "gitHelpers@2" },
+        { "command": "gitHelpers.showDiff",          "group": "gitHelpers@3" },
+        { "command": "gitHelpers.compareWithBranch", "group": "gitHelpers@4" },
+        { "command": "gitHelpers.toggleAnnotate",    "group": "gitHelpers@5" }
+      ]
+    }
+  },
+  "scripts": {
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.0.0"
+  }
+}
