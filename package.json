@@ -2,7 +2,7 @@
   "name": "intelligit",
   "displayName": "IntelliGit",
   "description": "Git helpers: rollback, diff, blame annotations, and commit viewer",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -17,6 +17,11 @@
   ],
   "publisher": "maroulie-com",
   "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maroulie-com/intelligit.git"
+  },
   "main": "./out/extension.js",
   "contributes": {
     "submenus": [
