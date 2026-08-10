@@ -1,4 +1,4 @@
-# IntelliGit
+# GitBrains
 
 Git helpers for VS Code: roll back files to a known-good version, diff against staged/remote/branch content, see inline blame as you move the cursor, and browse a commit's changes without leaving the editor — all from the Explorer and editor context menus, no terminal required.
 
@@ -23,8 +23,8 @@ All commands live under **Git** in the Explorer and editor context menus.
 
 ## Requirements
 
-- Git installed and available on your `PATH` (or configured via the built-in Git extension's `git.path` setting — IntelliGit reuses whatever `git.path` VS Code's own `vscode.git` extension resolves, so it stays consistent with your existing Git setup).
-- The built-in `vscode.git` extension enabled (IntelliGit depends on it).
+- Git installed and available on your `PATH` (or configured via the built-in Git extension's `git.path` setting — GitBrains reuses whatever `git.path` VS Code's own `vscode.git` extension resolves, so it stays consistent with your existing Git setup).
+- The built-in `vscode.git` extension enabled (GitBrains depends on it).
 
 ## Installation
 
@@ -33,11 +33,11 @@ All commands live under **Git** in the Explorer and editor context menus.
 Until then, build and install from source:
 
 ```sh
-git clone https://github.com/<org>/intelligit.git
-cd intelligit
+git clone https://github.com/maroulie-com/gitbrains.git
+cd gitbrains
 npm install
-npm run package                        # compiles and produces intelligit-<version>.vsix
-code --install-extension intelligit-<version>.vsix
+npm run package                        # compiles and produces gitbrains-<version>.vsix
+code --install-extension gitbrains-<version>.vsix
 ```
 
 ## Commands

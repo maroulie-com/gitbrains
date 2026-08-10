@@ -1,6 +1,6 @@
 {
-  "name": "intelligit",
-  "displayName": "IntelliGit",
+  "name": "gitbrains",
+  "displayName": "GitBrains",
   "description": "Git helpers: rollback, diff, blame annotations, and commit viewer",
   "version": "0.1.6",
   "engines": {
@@ -20,7 +20,7 @@
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maroulie-com/intelligit.git"
+    "url": "https://github.com/maroulie-com/gitbrains.git"
   },
   "main": "./out/extension.js",
   "contributes": {
