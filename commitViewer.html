@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commit Viewer</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 0; box-sizing: border-box; }
+        .commit-info { padding: 12px 16px; overflow-y: auto; flex-shrink: 0; max-height: 50%; }
+        .commit-info h3 { margin: 0 0 8px 0; }
+        .commit-info pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+        .divider { height: 1px; background: var(--vscode-panel-border); flex-shrink: 0; }
+        .files-section { padding: 12px 16px; overflow-y: auto; flex: 1; }
+        .files-section h3 { margin: 0 0 8px 0; }
+        ul { margin: 0; padding: 0; }
+        .file-item { padding: 4px 8px; cursor: pointer; list-style: none; border-radius: 3px; }
+        .file-item:hover { background: var(--vscode-list-hoverBackground); }
+        .file-item.active { background: var(--vscode-list-activeSelectionBackground); color: var(--vscode-list-activeSelectionForeground); }
+        .file-item.added { color: var(--vscode-gitDecoration-addedResourceForeground); }
+        .file-item.deleted { color: var(--vscode-gitDecoration-deletedResourceForeground); }
+    </style>
+</head>
+<body>
+    <div class="commit-info">
+        <h3 id="commit-hash"></h3>
+        <pre id="commit-message"></pre>
+    </div>
+    <div class="divider"></div>
+    <div class="files-section">
+        <h3 id="files-heading"></h3>
+        <ul id="file-list"></ul>
+    </div>
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        window.addEventListener('message', e => {
+            const { hash, commitMessage, files, activeFile } = e.data;
+
+            document.getElementById('commit-hash').textContent = 'Commit ' + hash.substring(0, 7);
+            document.getElementById('files-heading').textContent = `Files Changed (${files.length})`;
+
+            const pre = document.getElementById('commit-message');
+            pre.innerHTML = commitMessage.split(/(https?:\/\/[^\s]+)/g).map(part =>
+                part.match(/^https?:\/\//) ? `<a href="${part}">${part}</a>` : part.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            ).join('');
+
+            const ul = document.getElementById('file-list');
+            ul.innerHTML = files.map(f => {
+                const isActive = f.name === activeFile;
+                const isAdded = f.status === 'A';
+                const isDeleted = f.status === 'D';
+                const prefix = isAdded ? '+ ' : isDeleted ? '- ' : '  ';
+                const cls = ['file-item', isActive ? 'active' : '', isAdded ? 'added' : '', isDeleted ? 'deleted' : ''].filter(Boolean).join(' ');
+                return `<li class="${cls}" data-file="${f.name.replace(/"/g,'&quot;')}" data-status="${f.status}">${prefix}${f.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</li>`;
+            }).join('');
+
+            ul.querySelectorAll('.file-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    ul.querySelectorAll('.file-item.active').forEach(i => i.classList.remove('active'));
+                    el.classList.add('active');
+                    vscode.postMessage({ command: 'openFileDiff', file: el.dataset.file, status: el.dataset.status });
+                });
+            });
+
+            const activeEl = ul.querySelector('.file-item.active');
+            if (activeEl) activeEl.scrollIntoView({ block: 'center' });
+        });
+    </script>
+</body>
+</html>
