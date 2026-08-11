@@ -80,7 +80,7 @@ export async function compareWithBranch(uri?: vscode.Uri): Promise<void> {
     try {
         const relativePath = await gitUtils.getRelativeToRepo(filePath, cwd);
         await gitUtils.git(cwd, 'fetch --all');
-        const branchOutput = await gitUtils.git(cwd, 'branch -r');
+        const branchOutput = await gitUtils.git(cwd, 'branch -a');
         const branches = branchOutput.split('\n').map(b => b.trim()).filter(b => b && !b.includes('->'));
         const picked = await vscode.window.showQuickPick(branches, { placeHolder: 'Select branch to compare with' });
         if (!picked) return;
@@ -90,6 +90,49 @@ export async function compareWithBranch(uri?: vscode.Uri): Promise<void> {
         await vscode.commands.executeCommand('vscode.diff', branchUri, localUri, `${relativePath} (${picked} <-> working)`);
     } catch (err) {
         vscode.window.showErrorMessage(`Failed to compare with branch: ${(err as Error).message}`);
+    }
+}
+
+interface RevisionItem extends vscode.QuickPickItem {
+    hash: string;
+}
+
+/**
+ * Prompts for one of the file's past revisions (via `git log`), then opens
+ * VS Code's diff view comparing that revision against the current
+ * working-tree contents.
+ * @param uri - File to diff; defaults to the active editor's file.
+ */
+export async function compareWithRevisions(uri?: vscode.Uri): Promise<void> {
+    const filePath = uri?.fsPath || vscode.window.activeTextEditor?.document.uri.fsPath;
+    if (!filePath) { vscode.window.showErrorMessage('No File Selected'); return; }
+    const cwd = gitUtils.getCwdForFile(filePath);
+    try {
+        const relativePath = await gitUtils.getRelativeToRepo(filePath, cwd);
+        const root = await gitUtils.getGitRoot(cwd);
+        // Fields are separated with \x1f (unit separator) rather than a visible
+        // character, since commit subjects can contain almost anything else.
+        const logOutput = await gitUtils.git(root, `log --follow --date=relative --format="%H%x1f%ad%x1f%an%x1f%s" -- ${relativePath}`);
+        const revisions = logOutput.trim().split('\n').filter(Boolean).map(line => {
+            const [hash, date, author, subject] = line.split('\x1f');
+            return { hash, date, author, subject };
+        });
+        if (!revisions.length) { vscode.window.showInformationMessage('No revisions found for this file.'); return; }
+
+        const items: RevisionItem[] = revisions.map(r => ({
+            label: r.hash.substring(0, 7),
+            description: `${r.date} · ${r.author}`,
+            detail: r.subject,
+            hash: r.hash,
+        }));
+        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'Select a revision to compare with' });
+        if (!picked) return;
+
+        const revisionUri = vscode.Uri.from({ scheme: 'git-compare', path: '/' + relativePath, query: picked.hash, fragment: root });
+        const localUri = vscode.Uri.file(filePath);
+        await vscode.commands.executeCommand('vscode.diff', revisionUri, localUri, `${relativePath} (${picked.label} <-> working)`);
+    } catch (err) {
+        vscode.window.showErrorMessage(`Failed to compare with revisions: ${(err as Error).message}`);
     }
 }
 

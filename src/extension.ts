@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as gitUtils from './utils/gitUtils';
 import { checkOriginalHead, checkFileInOrigin } from './context/contextState';
 import { toggleAnnotate, enableAnnotate, updateAnnotateContext, disposeAll as disposeAnnotations } from './annotate/blameDecorations';
-import { rollback, localRollback, showDiff, compareWithBranch, resolveConflict, showCommit } from './commands/gitCommands';
+import { rollback, localRollback, showDiff, compareWithBranch, compareWithRevisions, resolveConflict, showCommit } from './commands/gitCommands';
 import { CommitViewerPanel } from './webview/commitViewerPanel';
 import { GitCompareContentProvider } from './contentProvider/gitCompareProvider';
 
@@ -28,6 +28,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('gitHelpers.localRollback', localRollback),
         vscode.commands.registerCommand('gitHelpers.showDiff', showDiff),
         vscode.commands.registerCommand('gitHelpers.compareWithBranch', compareWithBranch),
+        vscode.commands.registerCommand('gitHelpers.compareWithRevisions', compareWithRevisions),
         vscode.commands.registerCommand('gitHelpers.toggleAnnotate', toggleAnnotate),
         vscode.commands.registerCommand('gitHelpers.showCommit', () => showCommit(context.extensionUri)),
         vscode.commands.registerCommand('gitHelpers.resolveConflict', resolveConflict),
